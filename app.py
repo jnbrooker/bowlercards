@@ -12,8 +12,17 @@ from matplotlib.colors import Normalize
 from make_dfs import dataframes
 from card_parts import percentile_graph, header, statstable, release_point, pitching_points, arrival_points
 
-bowler_statistics_df, bowler_statistics_percentile, stat_names, release_point_df, ball_pitching_df, arrival_point_df = dataframes(2025)
+# bowler_statistics_df, bowler_statistics_percentile, stat_names, release_point_df, ball_pitching_df, arrival_point_df = dataframes(2025)
 current_stats_df = pd.read_csv('data/CountyChamp25CricinfoUpdated.csv')
+
+stat_names = ['Average Adjusted Velocity', '90th Percentile Adjusted Velocity', 'Adjusted Velocity Variation', 'Average Release Height',
+                  'Middle Percentage', 'Edge Percentage', 'Whiff Percentage', 'Runs per Edge']
+
+bowler_statistics_df = pd.read_csv('data/bowler_statistics_df.csv')
+bowler_statistics_percentile = pd.read_csv('data/bowler_statistics_percentile.csv')
+release_point_df = pd.read_csv('data/release_point_df.csv')
+ball_pitching_df = pd.read_csv('data/ball_pitching_df.csv')
+arrival_point_df = pd.read_csv('data/arrival_point_df.csv')
 
 @st.cache_data
 def bowler_card(bowler_name, current_stats_df):
