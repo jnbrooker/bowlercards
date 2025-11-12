@@ -9,7 +9,7 @@ import requests
 import numpy as np
 from matplotlib import cm
 from matplotlib.colors import Normalize
-from make_dfs import dataframes
+# from make_dfs import dataframes
 from card_parts import percentile_graph, header, statstable, release_point, pitching_points, arrival_points
 
 # bowler_statistics_df, bowler_statistics_percentile, stat_names, release_point_df, ball_pitching_df, arrival_point_df = dataframes(2025)
