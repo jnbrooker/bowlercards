@@ -65,6 +65,7 @@ def bowler_card(bowler_name, current_stats_df):
 
 
 st.title("Bowler Cards Web App")
+st.subheader("Numbers in the circles are the percentile ranking for each player relative to either Seamers or Spinners")
 bowler_name = st.selectbox("Select a Bowler", current_stats_df['Name'].unique())
 
 if st.button("Generate Bowler Card"):
