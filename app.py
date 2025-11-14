@@ -9,6 +9,8 @@ import requests
 import numpy as np
 from matplotlib import cm
 from matplotlib.colors import Normalize
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics.pairwise import euclidean_distances
 # from make_dfs import dataframes
 from card_parts import percentile_graph, header, statstable, release_point, pitching_points, arrival_points
 
@@ -44,8 +46,9 @@ def bowler_card(bowler_name, current_stats_df):
     ax_header = fig.add_subplot(gs[0:1, 0:4])
     header(bowler_name, current_stats_df, ax_header)
 
-    ax_table = fig.add_subplot(gs[1:2, :])
-    statstable(bowler_name, current_stats_df, ax_table)
+    if bowler_name in current_stats_df['Name'].unique().tolist():
+        ax_table = fig.add_subplot(gs[1:2, :])
+        statstable(bowler_name, current_stats_df, ax_table)
     ax_percentile = fig.add_subplot(gs[2:6, :])
     percentile_graph(stat_names, bowler_percentiles_list_percentages, colours, bowler_stats_list, ax_percentile)
 
@@ -62,12 +65,49 @@ def bowler_card(bowler_name, current_stats_df):
     # plt.show()
     return fig
 
+def near_players(player_name, attributes, df, top_n=10):
+    df = df.dropna(subset=attributes).reset_index(drop=True)
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(df[attributes])
+    
+    distances = euclidean_distances(features_scaled)
+    
+    name_to_idx = {name: i for i, name in enumerate(df["Bowler"])}
+    
+    if player_name not in name_to_idx:
+        raise ValueError(f"{player_name} not found in dataset")
+    
+    idx = name_to_idx[player_name]
+    
+    player_distances = distances[idx]
+    player_distances[idx] = float("inf")  # ignore self
+    
+    closest_indices = player_distances.argsort()[:top_n]
+    
+    closest_players = df.iloc[closest_indices]["Bowler"].tolist()
+    closest_distances = player_distances[closest_indices].tolist()
+    
+    return list(zip(closest_players, closest_distances))
+
 
 
 st.title("Bowler Cards Web App")
 st.subheader("Numbers in the circles are the percentile ranking for each player relative to either Seamers or Spinners")
-bowler_name = st.selectbox("Select a Bowler", current_stats_df['Name'].unique())
+bowler_name = st.selectbox("Select a Bowler", bowler_statistics_df['Bowler'].unique())
+attributes = st.multiselect(
+    "Select attributes:",
+    ['Average Adjusted Velocity','90th Percentile Adjusted Velocity',
+     'Adjusted Velocity Variation','Average Release Height','Middle Percentage',
+     'Edge Percentage','Whiff Percentage','Runs per Edge'],
+    default=['Average Adjusted Velocity','90th Percentile Adjusted Velocity',
+             'Adjusted Velocity Variation','Average Release Height']
+)
 
 if st.button("Generate Bowler Card"):
     fig = bowler_card(bowler_name, current_stats_df)
     st.pyplot(fig)
+
+if st.button("Find Close Players"):
+    results = near_players(bowler_name,attributes, bowler_statistics_df)
+    results_df = pd.DataFrame(results, columns=["Player", "Distance"])
+    st.table(results_df)

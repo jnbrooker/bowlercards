@@ -51,9 +51,11 @@ def percentile_graph(stat_names, bowler_percentiles_list_percentages, colours, b
 
 def header(bowler_name, current_stats_df, ax):
     current_player_stats = current_stats_df[current_stats_df['Name'] == bowler_name]
-    team = current_player_stats['Team'].iloc[0]
-    player_url = current_player_stats['Link'].iloc[0]
-    player_picture_route = f"Bowling Cards/{player_url.split('/')[-1]}.jpg"
+    if bowler_name in current_stats_df['Name'].unique().tolist():
+        team = current_player_stats['Team'].iloc[0]
+        player_url = current_player_stats['Link'].iloc[0]
+        player_picture_route = f"Bowling Cards/{player_url.split('/')[-1]}.jpg"
+    
 
     try:
         img = mpimg.imread(player_picture_route)
@@ -65,7 +67,10 @@ def header(bowler_name, current_stats_df, ax):
         print(f"Could not load image: {e}")
 
     ax.text(0.5, 0.9, bowler_name, fontsize=24, color='white', fontweight='bold', va='center', ha='center', fontfamily='Courier', transform=ax.transAxes)
-    ax.text(0.5, 0.5, team, fontsize=20, color='white', fontweight='bold', va='center', ha='center', fontfamily='Courier', transform=ax.transAxes)
+    try:
+        ax.text(0.5, 0.5, team, fontsize=20, color='white', fontweight='bold', va='center', ha='center', fontfamily='Courier', transform=ax.transAxes)
+    except Exception as e:
+        print(f"Could not find team: {e}")
     ax.axis("off")
     return ax
 
