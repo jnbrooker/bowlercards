@@ -94,6 +94,9 @@ def near_players(player_name, attributes, df, top_n=10):
 st.title("Bowler Cards Web App")
 st.subheader("Numbers in the circles are the percentile ranking for each player relative to either Seamers or Spinners")
 bowler_name = st.selectbox("Select a Bowler", bowler_statistics_df['Bowler'].unique())
+if st.button("Generate Bowler Card"):
+    fig = bowler_card(bowler_name, current_stats_df)
+    st.pyplot(fig)
 attributes = st.multiselect(
     "Select attributes:",
     ['Average Adjusted Velocity','90th Percentile Adjusted Velocity',
@@ -103,11 +106,9 @@ attributes = st.multiselect(
              'Adjusted Velocity Variation','Average Release Height']
 )
 
-if st.button("Generate Bowler Card"):
-    fig = bowler_card(bowler_name, current_stats_df)
-    st.pyplot(fig)
 
-if st.button("Find Close Players"):
+
+if st.button("Find Similar Players"):
     results = near_players(bowler_name,attributes, bowler_statistics_df)
     results_df = pd.DataFrame(results, columns=["Player", "Distance"])
     st.table(results_df)
